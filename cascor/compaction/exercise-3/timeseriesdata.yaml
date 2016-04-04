@@ -1,0 +1,66 @@
+#
+# Keyspace info
+#
+keyspace: musicdb
+
+#
+# The CQL for creating a keyspace (optional if it already exists)
+#
+keyspace_definition: |
+  CREATE KEYSPACE IF NOT EXISTS musicdb WITH replication = {'class': 'SimpleStrategy', 'replication_factor': 3};
+
+#
+# Table info
+#
+table: track_ratings_by_user
+
+#
+# The CQL for creating a table you wish to stress (optional if it already exists)
+#
+table_definition: |
+  CREATE TABLE IF NOT EXISTS track_ratings_by_user (
+    user UUID,
+    activity TIMEUUID,
+    rating INT,
+    album_title VARCHAR,
+    album_year INT,
+    track_title VARCHAR,
+    PRIMARY KEY (user, activity)
+  ) WITH CLUSTERING ORDER BY (activity DESC) AND
+  compaction = {'class': 'DateTieredCompactionStrategy', 'base_time_seconds': 120 } AND
+  default_time_to_live = 60;
+
+#
+# Optional meta information on the generated columns in the above table
+# The min and max only apply to text and blob types
+# The distribution field represents the total unique population
+# distribution of that column across rows.  Supported types are
+# 
+#      EXP(min..max)                        An exponential distribution over the range [min..max]
+#      EXTREME(min..max,shape)              An extreme value (Weibull) distribution over the range [min..max]
+#      GAUSSIAN(min..max,stdvrng)           A gaussian/normal distribution, where mean=(min+max)/2, and stdev is (mean-min)/stdvrng
+#      GAUSSIAN(min..max,mean,stdev)        A gaussian/normal distribution, with explicitly defined mean and stdev
+#      UNIFORM(min..max)                    A uniform distribution over the range [min, max]
+#      FIXED(val)                           A fixed distribution, always returning the same value
+#      Aliases: extr, gauss, normal, norm, weibull
+#
+#      If preceded by ~, the distribution is inverted
+#
+# Defaults for all columns are size: uniform(4..8), population: uniform(1..100B), cluster: fixed(1)
+#
+columnspec:
+  - name: user
+    size: uniform(10..20)
+    population: uniform(1..1M)     # the range of unique values to select for the field (default is 100Billion)
+  - name: activity
+    size: uniform(10..20)
+    population: uniform(1..1M)
+  
+insert:
+  partitions: uniform(1..10)      # number of unique partitions to update in a single operation
+                                  # if perbatch < 1, multiple batches will be used but all partitions will
+                                  # occur in all batches (unless already finished); only the row counts will vary
+queries:
+  simple1: 
+    cql: select album_title, album_year, track_title, rating from track_ratings_by_user where user = ? and activity = ?
+    fields: samerow

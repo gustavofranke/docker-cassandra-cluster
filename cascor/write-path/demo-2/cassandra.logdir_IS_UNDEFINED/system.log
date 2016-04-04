@@ -1,0 +1,4 @@
+INFO  [main] 2016-01-16 09:07:08,330 DCAwareRoundRobinPolicy.java:183 - Using data-center name 'datacenter1' for DCAwareRoundRobinPolicy (if this is incorrect, please provide the correct datacenter name with DCAwareRoundRobinPolicy constructor)
+INFO  [Cassandra Java Driver worker-0] 2016-01-16 09:07:08,344 Cluster.java:1527 - New Cassandra host localhost/127.0.0.1:9042 added
+INFO  [main] 2016-01-16 09:08:36,469 DCAwareRoundRobinPolicy.java:183 - Using data-center name 'datacenter1' for DCAwareRoundRobinPolicy (if this is incorrect, please provide the correct datacenter name with DCAwareRoundRobinPolicy constructor)
+INFO  [Cassandra Java Driver worker-0] 2016-01-16 09:08:36,490 Cluster.java:1527 - New Cassandra host localhost/127.0.0.1:9042 added
